@@ -1,0 +1,23 @@
+.page-footer {
+  height: 6.5vh;
+  width: 80vw;
+  border-top: 1px solid white;
+
+  &__text {
+    font-size: 2.5vmin;;
+  }
+
+  &__telegram {
+    margin-left: 58vw;
+  }
+  &__mail {
+    margin-left: 0.5vw;
+  }
+  &__telegram, &__mail {
+    text-decoration: none;
+    > img {
+      margin-top: 1.5vh;
+      height: 3.5vh;
+    }
+  }
+}

@@ -1,0 +1,28 @@
+.page-header {
+  margin-top: 2vmax;
+  height: 12vh;
+  display: table;
+  float: left;
+  width: 80vw;
+  border-bottom: 1px solid white;
+
+  &__logo {
+    height: 11vh;
+  }
+
+  &__name {
+    margin-top: 5vh;
+    font-weight: bold;
+    margin-left: 1vw;
+    vertical-align: bottom;
+    font-size: 5vmin;
+  }
+
+  &__tagline {
+    font-style: italic;
+    position: absolute;
+    margin-left: 2vw;
+    margin-top: 13vh;
+    font-size: 2.5vmin;
+  }
+}
