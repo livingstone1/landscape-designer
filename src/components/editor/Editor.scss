@@ -1,0 +1,20 @@
+.landscape-editor {
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  #container {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  p {
+    margin: 4px;
+  }
+
+  #drag-items img {
+    height: 100px;
+  }
+}

@@ -1,8 +1,8 @@
 import React from 'react';
-import logo from '../resources/logo/logo.png';
 import './App.scss';
 import {Header} from "../components/header/Header";
 import {Footer} from "../components/footer/Footer";
+import {Editor} from "../components/editor/Editor";
 
 function App() {
     return (
@@ -11,33 +11,7 @@ function App() {
             <br/>
             <br/>
             <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
+            <Editor/>
             <Footer/>
         </div>
     );
