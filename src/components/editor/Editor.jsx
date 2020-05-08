@@ -1,5 +1,5 @@
-import React, {useRef, useState} from 'react'
-import {Image, Layer, Stage} from 'react-konva';
+import React, {Fragment, useEffect, useRef, useState} from 'react'
+import {Image, Layer, Stage, Transformer} from 'react-konva';
 import useImage from 'use-image';
 import 'react-light-accordion/demo/css/index.css';
 
@@ -33,7 +33,21 @@ import {
 
 const URLImage = ({image, isSelected, onSelect, onChange}) => {
     const [img] = useImage(image.src);
+
+    const shapeRef = useRef();
+    const trRef = useRef();
+    useEffect(() => {
+        if (isSelected) {
+            console.log(shapeRef)
+            trRef.current.setNode(shapeRef.current);
+            trRef.current.getLayer().batchDraw();
+        } else {
+            console.log(shapeRef)
+        }
+    }, [isSelected]);
+
     return (
+        <Fragment>
         <Image
             id={image.id}
             image={img}
@@ -48,10 +62,40 @@ const URLImage = ({image, isSelected, onSelect, onChange}) => {
                 e.target.y(Math.round(e.target.y() / 10) * 10);
             }}
             draggable
+
+            {...image}
+
+            onClick={onSelect}
+            onTap={onSelect}
+            ref={shapeRef}
+
+            onDragEnd={e => {
+                console.log(shapeRef);
+                onChange({
+                    ...image,
+                    x: e.target.x(),
+                    y: e.target.y()
+                });
+            }}
         />
+            {isSelected && (
+                <Transformer
+                    ref={trRef}
+                    boundBoxFunc={(oldBox, newBox) => {
+                        // limit resize
+                        if (newBox.width < 5 || newBox.height < 5) {
+                            return oldBox;
+                        }
+                        return newBox;
+                    }}
+                />
+            )}
+        </Fragment>
+
     );
 };
 
+var designObjectId = 0
 export const Editor = () => {
     //accordion
     const [expanded, setExpanded] = React.useState(false);
@@ -63,6 +107,8 @@ export const Editor = () => {
     const dragImg = useRef();
     const stageRef = useRef();
     const [design, setDesign] = useState([]);
+    const [selectedId, selectShape] = useState(null);
+
     const onDragStart = e => {
         dragImg.current = {
             src: e.target.src,
@@ -75,6 +121,7 @@ export const Editor = () => {
         setDesign(design.concat([
                 {
                     ...stageRef.current.getPointerPosition(),
+                    id: designObjectId++,
                     src: dragImg.current.src,
                     height: dragImg.current.height,
                     width: dragImg.current.width
@@ -82,9 +129,17 @@ export const Editor = () => {
             ])
         );
     }
+    const checkDeselect = e => {
+        // deselect when clicked on empty area
+        const clickedOnEmpty = e.target === e.target.getStage();
+        if (clickedOnEmpty) {
+            selectShape(null);
+        }
+    };
 
     return (
         <div className="editor">
+            <button onClick={() => console.log(design)}>LOG</button>
             <div className="editor__items-list">
                 <ExpansionPanel id="p-1" expanded={expanded === 'buildings'} onChange={handleChange('buildings')}>
                     <ExpansionPanelSummary expandIcon={<span>🏡</span>}>Жилые постройки</ExpansionPanelSummary>
@@ -147,18 +202,30 @@ export const Editor = () => {
                 </ExpansionPanel>
             </div>
 
-
-
             <div className="editor__canvas" onDrop={e => onDrop(e)} onDragOver={e => e.preventDefault()}>
                 <Stage
                     width={750}
                     height={400}
+                    onMouseDown={checkDeselect}
+                    onTouchStart={checkDeselect}
                     ref={stageRef}
                 >
                     <Layer>
-                        {design.map((image) => {
+                        {design.map((designObject, i) => {
                             return <URLImage
-                                image={image}
+                                key={designObject.id}
+                                image={designObject}
+                                onChange={newAttrs => {
+                                    const rects = design.slice();
+                                    design[i] = newAttrs;
+                                    //console.log(newAttrs);
+                                    setDesign(rects);
+                                }}
+                                isSelected={designObject.id === selectedId}
+                                onSelect={() => {
+                                    selectShape(designObject.id);
+                                    console.log(designObject.id);
+                                }}
                             />;
                         })}
                     </Layer>
