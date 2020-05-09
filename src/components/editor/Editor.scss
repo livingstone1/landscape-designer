@@ -20,6 +20,7 @@
     }
 
     #p-1, #p-2, #p-3, #p-4, #p-5, #p-6, #p-7 {
+      background-color: #f8f9f0;
       font-size: 2vmin;
 
       .MuiExpansionPanelSummary-root {
@@ -47,7 +48,7 @@
     margin-left: 20vw;
     width: 750px;
     height: 400px;
-    background: rgba(165, 199, 104, 0.3) url("../../resources/bcg-2.png") 97% 103%;
+    background: rgba(153, 187, 153, 0.8) url("../../resources/bcg-2.png") 97% 103%;
     border: 1px solid white;
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
