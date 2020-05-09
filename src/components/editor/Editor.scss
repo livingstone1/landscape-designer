@@ -1,6 +1,8 @@
 .editor {
   width: 80vw;
   margin-bottom: 10vh;
+  color: inherit;
+  font-family: inherit;
 
   &__items-list {
     width: 20vw;
@@ -36,22 +38,42 @@
         img {
           cursor: pointer;
           display: block;
-          //margin-left: 30%;
+          margin: auto;
           margin-bottom: 10px;
-          transform: scale(0.6);
+          transform: scale(0.7);
         }
       }
     }
+
+    #p-1 .MuiExpansionPanelDetails-root img {
+      margin-left: -12%;
+      transform: scale(0.5);
+    }
+
   }
 
   &__canvas {
     margin-left: 20vw;
     width: 750px;
     height: 400px;
-    background: rgba(153, 187, 153, 0.8) url("../../resources/bcg-2.png") 97% 103%;
+    background: rgba(108,154,34, 0.3) url("../../resources/bcg-2.png") 97% 103%;
     border: 1px solid white;
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
     cursor: pointer;
+  }
+
+  > button {
+    margin-left: 67.5vw;
+    margin-bottom: 2vh;
+    background-color: #f8f9f0;
+    padding: 1vmin;
+    border-radius: 10px;
+    color: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 2vmin;
+
+    border: 1px solid rgba(108,154,34, 0.3);
   }
 }

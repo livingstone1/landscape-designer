@@ -4,7 +4,6 @@ import useImage from 'use-image';
 import 'react-light-accordion/demo/css/index.css';
 
 import './Editor.scss'
-
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -30,6 +29,7 @@ import {
     table_1,
     table_2, tree, tree_fruit
 } from "../../resources/objects/DesignObjects";
+import html2canvas from "html2canvas";
 
 const URLImage = ({image, isSelected, onSelect, onChange, onDragStart}) => {
     const [img] = useImage(image.src);
@@ -38,7 +38,6 @@ const URLImage = ({image, isSelected, onSelect, onChange, onDragStart}) => {
     const trRef = useRef();
     useEffect(() => {
         if (isSelected) {
-            //console.log(shapeRef)
             trRef.current.setNode(shapeRef.current);
             trRef.current.getLayer().batchDraw();
         }
@@ -46,60 +45,41 @@ const URLImage = ({image, isSelected, onSelect, onChange, onDragStart}) => {
 
     return (
         <Fragment>
-        <Image
-            id={image.id}
-            image={img}
-            x={image.x}
-            y={image.y}
-            height={image.height}
-            width={image.width}
-            offsetX={img && image.width ? image.width / 2 : 0}
-            offsetY={img && image.height ? image.height / 2 : 0}
-            onDragMove={e => {
-                e.target.x(Math.round(e.target.x() / 10) * 10);
-                e.target.y(Math.round(e.target.y() / 10) * 10);
-            }}
-            draggable
+            <Image
+                id={image.id}
+                image={img}
+                x={image.x}
+                y={image.y}
+                height={image.height}
+                width={image.width}
+                offsetX={img && image.width ? image.width / 2 : 0}
+                offsetY={img && image.height ? image.height / 2 : 0}
+                onDragMove={e => {
+                    e.target.x(Math.round(e.target.x() / 10) * 10);
+                    e.target.y(Math.round(e.target.y() / 10) * 10);
+                }}
+                draggable
 
-            {...image}
+                {...image}
 
-            onClick={onSelect}
-            onTap={onSelect}
-            ref={shapeRef}
+                onClick={onSelect}
+                onTap={onSelect}
+                ref={shapeRef}
 
-            onDragEnd={e => {
-                //console.log(shapeRef);
-                onChange({
-                    ...image,
-                    x: e.target.x(),
-                    y: e.target.y()
-                });
-            }}
-          /*  onTransformEnd={e => {
-                const node = shapeRef.current;
-                console.log(shapeRef)
-                const scaleX = node.scaleX();
-                const scaleY = node.scaleY();
-                console.log(scaleX)
-                console.log(scaleY)
-                node.scaleX(1);
-                node.scaleY(1);
-                onChange({
-                    ...image,
-                    x: node.x(),
-                    y: node.y(),
-                    width: Math.max(5, node.width() * scaleX),
-                    height: Math.max(node.height() * scaleY)
-                });
-            }}*/
-
-            onDragStart={onDragStart}
-        />
+                onDragEnd={e => {
+                    //console.log(shapeRef);
+                    onChange({
+                        ...image,
+                        x: e.target.x(),
+                        y: e.target.y()
+                    });
+                }}
+                onDragStart={onDragStart}
+            />
             {isSelected && (
                 <Transformer
                     ref={trRef}
                     boundBoxFunc={(oldBox, newBox) => {
-                        // limit resize
                         if (newBox.width < 5 || newBox.height < 5) {
                             return oldBox;
                         }
@@ -156,8 +136,24 @@ export const Editor = () => {
         setDesign(designObjects);
     }
 
+    //design img
+    const downloadURI = (uri, name) => {
+        const link = document.createElement('a');
+        link.download = name;
+        link.href = uri;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    const saveAsImage = () => {
+        html2canvas(document.querySelector('.editor__canvas')).then(function (canvas) {
+            const data = canvas.toDataURL('image/png');
+            downloadURI(data, 'design.png');
+        });
+    }
+
     const checkDeselect = e => {
-        // deselect when clicked on empty area
         const clickedOnEmpty = e.target === e.target.getStage();
         if (clickedOnEmpty) {
             selectShape(null);
@@ -166,7 +162,7 @@ export const Editor = () => {
 
     return (
         <div className="editor">
-            <button onClick={() => console.log(design)}>LOG</button>
+            <button className="editor__save-as-img" onClick={() => saveAsImage()}>Сохранить дизайн</button>
             <div className="editor__items-list">
                 <ExpansionPanel id="p-1" expanded={expanded === 'buildings'} onChange={handleChange('buildings')}>
                     <ExpansionPanelSummary expandIcon={<span>🏡</span>}>Жилые постройки</ExpansionPanelSummary>
@@ -217,7 +213,8 @@ export const Editor = () => {
                         <img src={bush_rose_yellow} height="80" onDragStart={e => onDragStart(e)}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
-                <ExpansionPanel id="p-7" expanded={expanded === 'decorative-objects'} onChange={handleChange('decorative-objects')}>
+                <ExpansionPanel id="p-7" expanded={expanded === 'decorative-objects'}
+                                onChange={handleChange('decorative-objects')}>
                     <ExpansionPanelSummary expandIcon={<span>🗿</span>}>Декоративные объекты</ExpansionPanelSummary>
                     <ExpansionPanelDetails>
                         <img src={object_1} height="100" onDragStart={e => onDragStart(e)}/>
@@ -228,7 +225,6 @@ export const Editor = () => {
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
             </div>
-
             <div className="editor__canvas" onDrop={e => onDrop(e)} onDragOver={e => e.preventDefault()}>
                 <Stage
                     width={750}
@@ -245,7 +241,6 @@ export const Editor = () => {
                                 onChange={newAttrs => {
                                     const designObjects = design.slice();
                                     design[i] = newAttrs;
-                                    //console.log(newAttrs);
                                     setDesign(designObjects);
                                 }}
                                 isSelected={designObject.id === selectedId}
