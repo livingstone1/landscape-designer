@@ -31,18 +31,16 @@ import {
     table_2, tree, tree_fruit
 } from "../../resources/objects/DesignObjects";
 
-const URLImage = ({image, isSelected, onSelect, onChange}) => {
+const URLImage = ({image, isSelected, onSelect, onChange, onDragStart}) => {
     const [img] = useImage(image.src);
 
     const shapeRef = useRef();
     const trRef = useRef();
     useEffect(() => {
         if (isSelected) {
-            console.log(shapeRef)
+            //console.log(shapeRef)
             trRef.current.setNode(shapeRef.current);
             trRef.current.getLayer().batchDraw();
-        } else {
-            console.log(shapeRef)
         }
     }, [isSelected]);
 
@@ -70,13 +68,32 @@ const URLImage = ({image, isSelected, onSelect, onChange}) => {
             ref={shapeRef}
 
             onDragEnd={e => {
-                console.log(shapeRef);
+                //console.log(shapeRef);
                 onChange({
                     ...image,
                     x: e.target.x(),
                     y: e.target.y()
                 });
             }}
+          /*  onTransformEnd={e => {
+                const node = shapeRef.current;
+                console.log(shapeRef)
+                const scaleX = node.scaleX();
+                const scaleY = node.scaleY();
+                console.log(scaleX)
+                console.log(scaleY)
+                node.scaleX(1);
+                node.scaleY(1);
+                onChange({
+                    ...image,
+                    x: node.x(),
+                    y: node.y(),
+                    width: Math.max(5, node.width() * scaleX),
+                    height: Math.max(node.height() * scaleY)
+                });
+            }}*/
+
+            onDragStart={onDragStart}
         />
             {isSelected && (
                 <Transformer
@@ -95,7 +112,7 @@ const URLImage = ({image, isSelected, onSelect, onChange}) => {
     );
 };
 
-var designObjectId = 0
+var designObjectId = 0;
 export const Editor = () => {
     //accordion
     const [expanded, setExpanded] = React.useState(false);
@@ -129,6 +146,16 @@ export const Editor = () => {
             ])
         );
     }
+    const onDragStartZIndex = e => {
+        const id = e.target.id();
+        const designObjects = design.slice();
+        const object = designObjects.find(i => i.id === id);
+        const index = designObjects.indexOf(object);
+        designObjects.splice(index, 1);
+        designObjects.push(object);
+        setDesign(designObjects);
+    }
+
     const checkDeselect = e => {
         // deselect when clicked on empty area
         const clickedOnEmpty = e.target === e.target.getStage();
@@ -216,16 +243,16 @@ export const Editor = () => {
                                 key={designObject.id}
                                 image={designObject}
                                 onChange={newAttrs => {
-                                    const rects = design.slice();
+                                    const designObjects = design.slice();
                                     design[i] = newAttrs;
                                     //console.log(newAttrs);
-                                    setDesign(rects);
+                                    setDesign(designObjects);
                                 }}
                                 isSelected={designObject.id === selectedId}
                                 onSelect={() => {
                                     selectShape(designObject.id);
-                                    console.log(designObject.id);
                                 }}
+                                onDragStart={onDragStartZIndex}
                             />;
                         })}
                     </Layer>

@@ -3,13 +3,13 @@
 $font-family: 'Merriweather';
 
 .main-page {
-  background: linear-gradient(to right, #546561 89.5vw, white 89.5vw, white 90vw, #546561 90vw);
+  background: linear-gradient(to right, #eff0e7 89.5vw, #54605a 89.5vw, #54605a 90vw, #eff0e7 90vw);
   overflow-x:hidden;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: white;
+  color: #54605a;
   font-family: $font-family;
 }
 
