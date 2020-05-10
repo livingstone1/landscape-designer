@@ -20,6 +20,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -40,7 +42,9 @@
     ]
   },
   "devDependencies": {
+    "gh-pages": "^2.2.0",
     "react-konva": "^16.13.0-0",
     "use-image": "^1.0.5"
-  }
+  },
+  "homepage": "https://livingstone1.github.io/landscape-designer/"
 }
