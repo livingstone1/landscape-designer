@@ -27,11 +27,19 @@ import {
     house_3, lake, object_1, object_2,
     pool, stone_1, stone_2,
     table_1,
-    table_2, tree, tree_fruit
+    table_2, tree, tree_fruit,
+    visualModels,
+    getModelById
 } from "../../resources/objects/DesignObjects";
 import html2canvas from "html2canvas";
+import genDesign from "../../resources/coord";
+import {Questionnaire} from "../questionnaire/Questionnaire";
+import axios from "axios";
 
-const URLImage = ({image, isSelected, onSelect, onChange, onDragStart}) => {
+//obj id counter
+var designObjectId = 0;
+
+const DesignObj = ({image, isSelected, onSelect, onChange, onDragStart}) => {
     const [img] = useImage(image.src);
 
     const shapeRef = useRef();
@@ -58,6 +66,7 @@ const URLImage = ({image, isSelected, onSelect, onChange, onDragStart}) => {
                     e.target.x(Math.round(e.target.x() / 10) * 10);
                     e.target.y(Math.round(e.target.y() / 10) * 10);
                 }}
+
                 draggable
 
                 {...image}
@@ -92,7 +101,6 @@ const URLImage = ({image, isSelected, onSelect, onChange, onDragStart}) => {
     );
 };
 
-var designObjectId = 0;
 export const Editor = () => {
     //accordion
     const [expanded, setExpanded] = React.useState(false);
@@ -112,10 +120,13 @@ export const Editor = () => {
             height: e.target.height,
             width: e.target.width
         };
+        console.log(e.target);
     };
     const onDrop = e => {
+        console.log(e);
         stageRef.current.setPointersPositions(e);
-        setDesign(design.concat([
+        setDesign(
+            design.concat([
                 {
                     ...stageRef.current.getPointerPosition(),
                     id: designObjectId++,
@@ -125,6 +136,7 @@ export const Editor = () => {
                 }
             ])
         );
+        console.log(dragImg.current);
     }
     const onDragStartZIndex = e => {
         const id = e.target.id();
@@ -160,68 +172,96 @@ export const Editor = () => {
         }
     };
 
+    //generate
+    const [questionnaire, setQuestionnaire] = useState(false);
+
+    const generate= () => {
+        setDesign([]);
+        setQuestionnaire(true);
+    }
+
     return (
         <div className="editor">
-            <button className="editor__save-as-img" onClick={() => saveAsImage()}>Сохранить дизайн</button>
+            <div className="editor__control-panel">
+
+                <button className="editor__test" onClick={() => setDesign(design.concat(
+                    [{
+                        x: 100,
+                        id: designObjectId++,
+                        y: 100,
+                        src: stone_1,
+                        height: 50,
+                        width: 50
+                    }]
+                ))}>Тест отрисовки</button>
+
+                <button className="editor__advice" onClick={() => console.log(design)}>Получить совет</button>
+                <button className="editor__generate" onClick={() =>
+                    generate()}>Сгенерировать дизайн</button>
+                <button className="editor__open" onClick={() => console.log(getModelById("house_1"))}>Открыть проект</button>
+                <button className="editor__save" onClick={() => saveAsImage()}>Сохранить проект</button>
+            </div>
+            {questionnaire &&  <Questionnaire design={design} setDesign={setDesign} setQuestionnaire={setQuestionnaire}/>}
             <div className="editor__items-list">
                 <ExpansionPanel id="p-1" expanded={expanded === 'buildings'} onChange={handleChange('buildings')}>
                     <ExpansionPanelSummary expandIcon={<span>🏡</span>}>Жилые постройки</ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <img src={house_1} height="300" onDragStart={e => onDragStart(e)}/>
-                        <img src={house_2} height="300" onDragStart={e => onDragStart(e)}/>
-                        <img src={house_3} height="300" onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("house_1").img} height={getModelById("house_1").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("house_2").img} height={getModelById("house_2").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("house_3").img} height={getModelById("house_3").height}onDragStart={e => onDragStart(e)}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel id="p-2" expanded={expanded === 'rest-zone'} onChange={handleChange('rest-zone')}>
                     <ExpansionPanelSummary expandIcon={<span>🧩</span>}>Зона отдыха</ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <img src={bbq} height="70" onDragStart={e => onDragStart(e)}/>
-                        <img src={chair} height="80" onDragStart={e => onDragStart(e)}/>
-                        <img src={gazebo} height="125" onDragStart={e => onDragStart(e)}/>
-                        <img src={pool} height="125" onDragStart={e => onDragStart(e)}/>
-                        <img src={table_1} height="100" onDragStart={e => onDragStart(e)}/>
-                        <img src={table_2} height="100" onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bbq").img} height={getModelById("bbq").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("chair").img} height={getModelById("chair").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("gazebo").img} height={getModelById("gazebo").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("pool").img} height={getModelById("pool").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("table_1").img} height={getModelById("table_1").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("table_2").img} height={getModelById("table_2").height} onDragStart={e => onDragStart(e)}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel id="p-3" expanded={expanded === 'trees'} onChange={handleChange('trees')}>
                     <ExpansionPanelSummary expandIcon={<span>🌳</span>}>Деревья</ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <img src={tree} height="130" onDragStart={e => onDragStart(e)}/>
-                        <img src={conifer} height="150" onDragStart={e => onDragStart(e)}/>
-                        <img src={tree_fruit} height="130" onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("tree").img} height={getModelById("tree").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("conifer").img} height={getModelById("conifer").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("tree_fruit").img} height={getModelById("tree_fruit").height} onDragStart={e => onDragStart(e)}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel id="p-4" expanded={expanded === 'bushes'} onChange={handleChange('bushes')}>
                     <ExpansionPanelSummary expandIcon={<span>🌾</span>}>Кустарники</ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <img src={bush_1} height="90" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_2} height="90" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_3} height="90" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_4} height="90" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_5} height="90" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_6} height="90" onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_1").img} height={getModelById("bush_1").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_2").img} height={getModelById("bush_2").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_3").img} height={getModelById("bush_3").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_4").img} height={getModelById("bush_4").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_5").img} height={getModelById("bush_5").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_6").img} height={getModelById("bush_6").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_berry").img} height={getModelById("bush_berry").height} onDragStart={e => onDragStart(e)}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel id="p-6" expanded={expanded === 'flowers'} onChange={handleChange('flowers')}>
                     <ExpansionPanelSummary expandIcon={<span>🌺</span>}>Цветы</ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <img src={bush_aster} height="80" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_blue} height="80" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_pink} height="80" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_rose_red} height="80" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_rose_white} height="80" onDragStart={e => onDragStart(e)}/>
-                        <img src={bush_rose_yellow} height="80" onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_aster").img} height={getModelById("bush_aster").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_blue").img} height={getModelById("bush_blue").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_pink").img} height={getModelById("bush_pink").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_rose_red").img} height={getModelById("bush_rose_red").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_rose_white").img} height={getModelById("bush_rose_white").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("bush_rose_yellow").img} height={getModelById("bush_rose_yellow").height} onDragStart={e => onDragStart(e)}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel id="p-7" expanded={expanded === 'decorative-objects'}
                                 onChange={handleChange('decorative-objects')}>
                     <ExpansionPanelSummary expandIcon={<span>🗿</span>}>Декоративные объекты</ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <img src={object_1} height="100" onDragStart={e => onDragStart(e)}/>
-                        <img src={object_2} height="100" onDragStart={e => onDragStart(e)}/>
-                        <img src={lake} height="150" onDragStart={e => onDragStart(e)}/>
-                        <img src={stone_1} height="30" onDragStart={e => onDragStart(e)}/>
-                        <img src={stone_2} height="30" onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("object_1").img} height={getModelById("object_1").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("object_2").img} height={getModelById("object_2").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("lake").img} height={getModelById("lake").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("stone_1").img} height={getModelById("stone_1").height} onDragStart={e => onDragStart(e)}/>
+                        <img src={getModelById("stone_2").img} height={getModelById("stone_2").height} onDragStart={e => onDragStart(e)}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
             </div>
@@ -235,7 +275,7 @@ export const Editor = () => {
                 >
                     <Layer>
                         {design.map((designObject, i) => {
-                            return <URLImage
+                            return <DesignObj
                                 key={designObject.id}
                                 image={designObject}
                                 onChange={newAttrs => {
@@ -256,5 +296,3 @@ export const Editor = () => {
         </div>
     )
 }
-
-
